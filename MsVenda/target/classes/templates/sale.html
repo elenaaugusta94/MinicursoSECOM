@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MsSaleSpring</title>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous"></link>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"
+	integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+	crossorigin="anonymous"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+	integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+	crossorigin="anonymous"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+
+<script>
+            window.products = [];
+            
+            console.log(window.products)
+            window.client = null;
+
+            var saleApp = angular.module('SaleApp', []).controller('SaleController', ['$scope','$window', '$http','$q', function ($scope, $window, $http, $q) {
+                $scope.products = [];
+
+                /*
+                 * Variáveis do sistema (erro de server, se achou ou não o cliente...)
+                 */
+                $scope.system_variables = {};
+                $scope.system_variables.server_not_available = false;
+                $scope.system_variables.sale_submitted = false;
+                $scope.system_variables.client_search = false;
+                $scope.system_variables.client_found = false;
+                
+                $scope.client = {};
+                $scope.client.cpf = "";
+                
+                
+                //Funcao para converter um numeral em String para inteiro
+                $scope.parseInt = function(number) {
+                    return parseInt(number, 10);
+                }
+                
+                $scope.selection = {};
+                 
+                $scope.productSelected = {};
+                $scope.qtStock = 0;
+                $scope.qt = 0;
+                
+                /*
+                 * FUnção para pegar cliente por CPF
+                 * @returns {undefined}
+                 */
+                $scope.getClientByCPF = function(){
+                    console.log("Searching by " + $scope.client.cpf);
+                    $http({
+                        method: 'GET',
+                        url: 'http://localhost:9097/venda/getCustomerCpf/' + $scope.client.cpf
+                    }).then(function (success){
+                        console.log(success);
+                        $scope.client.dados = success.data;
+                        if(success.status === 200){
+                            $scope.system_variables.client_search = false;
+                            $scope.system_variables.client_found = true;
+                        } else {
+                            $scope.system_variables.client_search = true;
+                            $scope.system_variables.client_found = false;
+                        }
+                    }, function (error){
+                        console.log(error);
+                        $scope.system_variables.client_search = true;
+
+                    });
+                };
+                
+                /*
+                 * Função para processar uma compra
+                 */
+                $scope.quantidadeASerAtualizada={};
+                $scope.IDdoproduto={};
+                
+                $scope.processPurchase = function(quantidadeASerAtualizada,IDdoproduto ){
+                    
+                    
+                    $http({
+                        method:'GET',
+                        url: 'http://localhost:9097/atualizaProducts/' + $scope.quantidadeASerAtualizada + '/' + $scope.IDdoproduto
+                    }).then(function (succes){ //Deu certo :)
+                        console.log(success);
+                    
+                        //FAZ AS ACOES NECESSARIAS AQUI
+                    },function(error){ //DEU ERRADO :(
+                        console.log(error);
+                    });
+                };
+                
+                /*
+                 * Carrega os produtos. 
+                 */
+                $http({
+                     method: 'GET',
+                     url: 'http://localhost:9097/getProducts'
+                  }).then(function (success){
+                        console.log(success);
+                        $scope.products = success.data;
+                        console.log($scope.products)
+                  },function (error){
+                         console.log(error);
+                  });
+  
+              
+                /*
+                 * Variáveis do carrinho
+                 */
+                $scope.cart = {};
+                $scope.total = 0;
+               
+                
+                /*
+                 * Função para adicionar um produto no carrinho
+                 */
+                $scope.addProduct = function(){
+                    if(!($scope.cart[$scope.productSelected.product.id])){
+                        if(isNaN($scope.selection.qt)){
+                            alert('Invalid quantity');
+                        }else{
+                            var id = $scope.productSelected.product.id;
+                            var name = $scope.productSelected.product.name;
+                            var price = parseFloat($scope.productSelected.product.value);
+                            var qt = $scope.selection.qt;
+                            $scope.cart[$scope.productSelected.product.id] = {id: id, name: name, qt: qt, price: price};
+                            $scope.total += qt * price;
+                        }
+                    }
+                }
+                
+                /*
+                 * Função para removr um produto do carrinho
+                 */
+                $scope.removeProduct = function(id){
+                    $scope.total -= $scope.cart[id].qt * $scope.cart[id].price;
+                    delete $scope.cart[id];
+                }
+                
+                /*
+                 * Função para selecionar um item
+                 */
+                $scope.selectedItemChanged = function(){
+                    console.log($scope.products);
+                    console.log($scope.productSelected.product);
+                    $scope.qtStock = $scope.productSelected.product.number;
+                    //$scope.qtStock = $scope.productSelected.number;
+                }
+            }]);
+        </script>
+</head>
+<style>
+body {
+	padding: 0;
+}
+
+.page-header {
+	background-color: #ddd;
+	margin-top: 0;
+}
+
+.header {
+	margin-left: 10px;
+	background-color: #ddd;
+}
+</style>
+<body>
+	<nav class="navbar navbar-inverse">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Microservices - Toy Example</a>
+			</div>
+		</div>
+	</nav>
+	<div class="container" ng-app="SaleApp" ng-controller="SaleController">
+		<div ng-if="system_variables.server_not_available">
+			<div class="alert alert-danger">{{system_variables.server_not_available}}</div>
+		</div>
+		<div ng-if="system_variables.sale_submitted ">
+			<div class="alert alert-success">The sale was successfully
+				registered.</div>
+		</div>
+		<div ng-if="system_variables.sale_submitted ">
+			<div class="alert alert-danger">Could not register the sale</div>
+		</div>
+		<div ng-if="system_variables.client_search ">
+			<div class="alert alert-danger">Customer not found</div>
+		</div>
+		<!--<form action="service" method="post">-->
+			 <label>Customer CPF: {{client.cpf}}</label>
+			<div class="form-inline">
+				<input name="cpf" id="cpf" class="form-control" ng-model="client.cpf"/> 
+                                <button ng-click="getClientByCPF()" class="btn btn-default">Search</button>
+			</div>                    
+		<!--</form>-->
+		<div ng-if="system_variables.client_found">
+			<hr>
+			<h3>Customer: {{client.dados.name}} ( {{client.dados.email}} -
+				{{client.dados.cpf}})</h3>
+
+			<div>
+				<div class="form-group col-md-3">
+					<label>Product: {{productSelected.product.name}}</label> <select id="product" class="form-control"
+						ng-model="productSelected.product" ng-options="p as p.name + ' - ' + p.description for p in products track by p.id"
+						ng-change='selectedItemChanged()'>
+					</select>
+				</div>
+				<div class="form-group col-md-1">
+					<label>Stock</label> <input class="form-control" type="number"
+						ng-model="qtStock" disabled="disabled" />
+				</div>
+				<div class="form-group col-md-1">
+					<label>Quantity</label> <input class="form-control" type="number"
+						ng-model="selection.qt" min="1" max="{{qtStock}}" />
+				</div>
+				<div class="form-group col-md-2">
+					<label>&nbsp;</label>
+					<button type="button" class="btn btn-success form-control"
+						ng-click="addProduct()">Add in cart</button>
+				</div>
+			</div>
+			<!--<form action="service" method="post">-->
+				<input type="hidden" name="logic" value="SaleController" />
+				<table class="table">
+					<thead>
+						<th>ID</th>
+						<th>Product</th>
+						<th>Quantity</th>
+						<th>Unit Price</th>
+						<th>Total</th>
+						<th>Remove</th>
+					</thead>
+					<tbody>
+						<tr ng-repeat="(id, product) in cart">
+							<td>{{id}}</td>
+							<td>{{product.name}}</td>
+							<td>{{product.qt}}x</td>
+							<td>$ {{product.price}}</td>
+							<td>$ {{product.price * product.qt}}</td>
+							<td><button type="button" class="btn btn-danger"
+									ng-click="removeProduct(id)">remove</button></td>
+							<input type="hidden" name="product_id" value="{{id}}" />
+							<input type="hidden" name="product_qtd" value="{{product.qt}}" />
+						</tr>
+					</tbody>
+				</table>
+                                <span><b>Total: $ {{total}}</b></span><br /> <button ng-click="processPurchase()" class="btn btn-default">Purchase</button>
+			<!--</form>-->
+			</hr>
+		</div>
+	</div>
+</body>
+</html>

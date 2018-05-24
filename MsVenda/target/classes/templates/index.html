@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TODO supply a title</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous"></link>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"
+	integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+	crossorigin="anonymous"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+	integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+	crossorigin="anonymous"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+
+<script>
+	var saleApp = angular
+			.module('SaleApp', [])
+			.controller(
+					'SaleController',
+					[
+							'$scope',
+							'$window',
+							'$http',
+							'$q',
+							function($scope, $window, $http, $q) {
+
+								$scope.system_variables = {};
+
+								$scope.system_variables.login_fail = false;
+								$scope.system_retorno = "";
+								$scope.user = "";
+								$scope.password = "";
+								$scope.venda = "";
+								$scope.system_variables.authentication_search = false;
+
+								$scope.getAuthentication = function() {
+									console.log("Searching by " + $scope.user);
+									console
+											.log("falha?  "
+													+ $scope.system_variables.login_fail);
+
+									$http(
+											{
+												method : 'GET',
+												url : 'http://localhost:9097/venda/autenticacao/'
+														+ $scope.user
+														+ '/'
+														+ $scope.password
+
+											})
+											.then(
+													function(success) {
+
+														$scope.system_retorno = success.data;
+														console
+																.log("retorno da autenticaçao "
+																		+ $scope.system_retorno);
+														if ($scope.system_retorno == true) {
+															$scope.system_variables.login_fail = false; // no ser necessario reentrar com o login e senha
+															$scope.system_variables.authentication_search = true;
+															window.location = "http://localhost:9097/sale";
+
+														} else {
+															$scope.system_variables.authentication_search = false;
+															$scope.system_variables.login_fail = true;
+														}
+													},
+													function(error) {
+														console.log(error);
+														$scope.system_variables.authentication_search = true;
+													});
+								}
+							} ]);
+</script>
+
+
+<style>
+.loginmodal-container {
+	padding: 30px;
+	max-width: 350px;
+	width: 100% !important;
+	background-color: #F7F7F7;
+	margin: 0 auto;
+	border-radius: 2px;
+	box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+	overflow: hidden;
+	font-family: roboto;
+}
+
+.loginmodal-container h1 {
+	text-align: center;
+	font-size: 1.8em;
+	font-family: roboto;
+}
+
+.loginmodal-container input[type=submit] {
+	width: 100%;
+	display: block;
+	margin-bottom: 10px;
+	position: relative;
+}
+
+.loginmodal-container input[type=text], input[type=password] {
+	height: 44px;
+	font-size: 16px;
+	width: 100%;
+	margin-bottom: 10px;
+	-webkit-appearance: none;
+	background: #fff;
+	border: 1px solid #d9d9d9;
+	border-top: 1px solid #c0c0c0;
+	/* border-radius: 2px; */
+	padding: 0 8px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+}
+
+.loginmodal-submit {
+	/* border: 1px solid #3079ed; */
+	border: 0px;
+	color: #fff;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.1);
+	background-color: #4d90fe;
+	padding: 17px 0px;
+	font-family: roboto;
+	font-size: 14px;
+}
+
+.loginmodal-submit:hover {
+	border: 0px;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+	background-color: #357ae8;
+}
+</style>
+</head>
+<body>
+
+	<div class="container" ng-app="SaleApp" ng-controller="SaleController">
+		<div class="container">
+			<div class="loginmodal-container">
+				<h1>Login to Your Account</h1>
+
+				<div ng-if="system_variables.login_fail">
+					<div class="alert alert-danger">Login ou senha incorreto(s)</div>
+				</div>
+				<div class="form-inline">
+					<div>
+						<input type="text" name="username" id="username"
+							class="form-control" ng-model="user" />
+					</div>
+					<div>
+						<input type="password" name="password" id="password"
+							class="form-control" ng-model="password" />
+						<div>
+							<button ng-click="getAuthentication()" class="btn btn-default">Login</button>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

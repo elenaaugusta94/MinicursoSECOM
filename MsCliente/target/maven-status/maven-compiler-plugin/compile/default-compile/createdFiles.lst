@@ -1,0 +1,6 @@
+com/App/App.class
+com/intercomm/FeignConfiguration.class
+com/entities/Cliente.class
+com/controller/GerenciadorCliente.class
+com/intercomm/CustomerProductInterface.class
+com/intercomm/CustomerProductService.class
