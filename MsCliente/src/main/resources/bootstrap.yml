@@ -1,6 +1,5 @@
 spring:
     application:
         name: MsCliente
-    server.port: 9093
-    server: localhost
+   
 

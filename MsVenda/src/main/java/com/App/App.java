@@ -13,13 +13,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.client.RestTemplate;
 
-@ComponentScan({ "com.services" })
+//@ComponentScan({ "com.services" })
 
 @EnableEurekaClient
 @EnableDiscoveryClient
 @EnableAutoConfiguration
 @EnableZuulProxy
-@EnableFeignClients(basePackages = {"com.intercomm", "com.controller"})
+@EnableFeignClients(basePackages = {"com.intercomm", "com.services"})
 @SpringBootApplication(scanBasePackages = { "com.intercomm", "com.services" })
 public class App {
 

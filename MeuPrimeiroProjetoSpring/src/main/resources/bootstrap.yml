@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: primeiro-projeto
+    
+  cloud:
+    config:
+      enabled: true 
+      discovery:  
+        enabled: true
+        serviceId: config
+ 
+ 

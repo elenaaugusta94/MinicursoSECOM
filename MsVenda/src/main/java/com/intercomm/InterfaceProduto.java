@@ -16,9 +16,4 @@ public interface InterfaceProduto {
 	@RequestMapping( method = RequestMethod.GET, value="/produto/obterProdutoPorId/{id}")
 	public Object obterProdutoId(@PathVariable("id") String id);
 	
-//	@RequestMapping( method = RequestMethod.GET, value="/getProducts")
-//	public String getAllProduct();
-	
-	@RequestMapping( method = RequestMethod.POST, value="/venda/{id}/{qnt}")
-	public String updateStock(@PathVariable("id") String[] id, @PathVariable("qnt") String[] qnt);
 }

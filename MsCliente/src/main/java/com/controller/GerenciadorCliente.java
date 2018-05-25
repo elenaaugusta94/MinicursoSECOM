@@ -23,6 +23,7 @@ public class GerenciadorCliente {
 		this.listaClientes.add(cliente2);
 		this.listaClientes.add(cliente3);
 	}
+	// IMPLEMENTAR OUTROS MÉTODOS NECESSÁRIOS PARA RECUPERAR INFORMAÇÕES DO CLIENTE
 	@RequestMapping(value = "obter/{nome}", method = RequestMethod.GET)
 	public Cliente obterClientePorNome(@PathVariable String nome) {
 		for(int i=0; i<listaClientes.size();i++) {
@@ -32,15 +33,7 @@ public class GerenciadorCliente {
 		}
 		return null;
 	}
-	@RequestMapping(value = "/cliente/getClienteCpf/{cpf}", method = RequestMethod.GET)
-	public Cliente obterClientePorCPFGet(@PathVariable String cpf) {
-		for(int i=0; i<listaClientes.size();i++) {
-			if(this.listaClientes.get(i).getCpf().equals(cpf)) {
-				return this.listaClientes.get(i);
-			}
-		}
-		return null;
-	}
+	
 	@RequestMapping(value = "cliente/getClienteCpfPOST/")
 	public String obterClientePorCPFPost(@RequestParam("cpf") String cpf) {
 		Gson gson = new Gson();
@@ -49,7 +42,6 @@ public class GerenciadorCliente {
 			System.out.println(listaClientes.get(i).getCpf()+ " o cpf: " + cpf);
 			if(this.listaClientes.get(i).getCpf().equals(cpf)) {
 				String respostaJson = gson.toJson(listaClientes.get(i));
-				System.out.println("Resposta: " + respostaJson);
 				return respostaJson;
 			}
 		}

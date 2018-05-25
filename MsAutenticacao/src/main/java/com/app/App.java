@@ -6,14 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
-//@EntityScan("com.entities")
-//@ComponentScan({"com.controller"})
-//@EnableJpaRepositories("com.DAO")
 @EnableEurekaClient
 @EnableDiscoveryClient
 @EnableAutoConfiguration
-//@EnableFeignClients(basePackages = {"com.controller"})
-@SpringBootApplication(scanBasePackages={"com.controller", "com.entities"})
+@SpringBootApplication(scanBasePackages={"com.services", "com.entities"})
 
 public class App 
 {

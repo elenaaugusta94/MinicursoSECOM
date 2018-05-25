@@ -11,7 +11,6 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 @SpringBootApplication(scanBasePackages={"com.controller","com.entities"})
 @EnableEurekaClient
 @EnableDiscoveryClient
-@EnableFeignClients
 public class App {
 
 	public static void main(String[] args) {

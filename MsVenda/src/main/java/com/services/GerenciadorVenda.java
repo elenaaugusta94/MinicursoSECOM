@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.gson.Gson;
 import com.intercomm.InterfaceAutenticacao;
 import com.intercomm.InterfaceCliente;
 import com.intercomm.InterfaceProduto;
@@ -22,10 +21,9 @@ public class GerenciadorVenda {
 
 	@Autowired
 	private InterfaceProduto produto;
-	//
-	 @Autowired
-	 private InterfaceCliente cliente;
-	//
+	
+//	 @Autowired
+//	 private InterfaceCliente cliente;
 	
 	@Autowired
 	private RestTemplate restTemplate;
@@ -36,12 +34,6 @@ public class GerenciadorVenda {
 	public GerenciadorVenda() {
 	}
 
-	/**
-	 * 
-	 * Retorna os produtos atraves do product feign como uma string JSON
-	 * 
-	 * @return
-	 */
 	@RequestMapping(value = "venda/getProdutos", method = RequestMethod.GET)
 	@ResponseBody
 	public ArrayList getProducts() {
@@ -56,29 +48,20 @@ public class GerenciadorVenda {
 		return produto.obterTodosProdutos();
 	}
 
-	@RequestMapping(value = "venda/getProdutoID/{id}", method = RequestMethod.GET)
+	
+	@RequestMapping(value="venda/atualizaEstoque/{id}/{quantidade}", method = RequestMethod.GET)
 	@ResponseBody
-	public Object getProdutoIDFeign(@PathVariable String id) {
-		return produto.obterProdutoId(id);
-	}
-
-	@RequestMapping(value="venda/autenticacaoRest/{user}/{senha}", method = RequestMethod.GET)
-	@ResponseBody
-	public boolean getAutenticacao(@PathVariable("user") String user, @PathVariable("senha") String senha) {
-		String url = "http://MsAutenticacao/autenticacao/autenticarPOST/";
-		LinkedMultiValueMap<String, String> parametros = new LinkedMultiValueMap<String,String>();
-		parametros.add("nome", user);
-		parametros.add("senha", senha);
-		boolean response = restTemplate.postForObject(url, parametros, Boolean.class);
+	public String updateListProduto(@PathVariable("id") String id, @PathVariable("quantidade") String quantidade) {
+		//String url = "http://MsProduto/produto/atualizaEstoque/";
+		String url = "http://MsProduto/produto/atualizaEstoque/";
+		LinkedMultiValueMap<String,String> parametros = new LinkedMultiValueMap<String,String>();
+		parametros.add("id", id);
+		parametros.add("quantidade", quantidade);
+		String response = restTemplate.postForObject(url, parametros, String.class);
 		return response;
 	}
 	
-	@RequestMapping(value= "venda/autenticacao/{user}/{senha}",  method = RequestMethod.GET)
-	@ResponseBody
-	public boolean getAutenticacaoFeign(@PathVariable("user") String user, @PathVariable("senha") String senha) {
-		System.err.println("User: " + user + "Senha: " + senha);
-		return autenticacao.autenticarFuncionario(user, senha);
-	}
+	
 	
 	@RequestMapping(value="venda/getClienteCpfPOST/{cpf}", method = RequestMethod.GET,produces = "application/json")
 	@ResponseBody
@@ -87,15 +70,8 @@ public class GerenciadorVenda {
 		LinkedMultiValueMap<String, String> parametros = new LinkedMultiValueMap<String,String>();
 		parametros.add("cpf", cpf);
 		String response = restTemplate.postForObject(url, parametros, String.class);
-//		Gson g = new Gson();
-//		return g.toJsonTree(response);
 		return response;
 	}
 	
-	@RequestMapping(value= "venda/getClienteCPF/{cpf}",  method = RequestMethod.GET)
-	@ResponseBody
-	public Object getClienteFeign(@PathVariable("cpf") String cpf) {
-		System.err.println("Cpf: " + cpf);
-		return cliente.getClientePorCpf(cpf);
-	}
+	
 }

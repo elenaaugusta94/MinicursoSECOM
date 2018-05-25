@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.entities.Produto;
@@ -22,10 +23,6 @@ public class GerenciadorProduto {
 		this.listaProdutos.add(p2);
 		this.listaProdutos.add(p3);
 	}
-	@RequestMapping(value = "produto/obterProdutos", method = RequestMethod.GET)
-	private ArrayList<Produto> mostrarTodosProdutos(){
-		return this.listaProdutos;
-	}
 	@RequestMapping(value = "produto/obterQuantidadeProduto/{nome}", method = RequestMethod.GET)
 	private int verificaDisponibilidade(@PathVariable String nome) {
 		for(int i=0;i<this.listaProdutos.size();i++) {
@@ -35,14 +32,27 @@ public class GerenciadorProduto {
 		}
 		return -1;
 	}
-	
-	@RequestMapping(value = "produto/obterProdutoPorId/{id}", method = RequestMethod.GET)
-	private Produto obterProdutoID(@PathVariable String id) {
+	@RequestMapping(value = "produto/atualizaEstoque/", method = {RequestMethod.GET, RequestMethod.POST})
+	private String atualizaEstoque(@RequestParam("id") String id, @RequestParam("quantidade") String quantidade) {
+		int quant = Integer.parseInt(quantidade);
+		System.err.println("Produto id: " + id + " quantidade: " + quantidade);
 		for(int i=0;i<this.listaProdutos.size();i++) {
 			if(this.listaProdutos.get(i).getId().equals(id)) {
-				return this.listaProdutos.get(i);
+				int qntAtual = this.listaProdutos.get(i).getQuantidade();
+				if(qntAtual > 0) {
+					this.listaProdutos.get(i).setQuantidade(qntAtual - quant);
+					return "Sucesso!";
+				}
+				else if(qntAtual-quant<0) {
+					return "Nao eh possivel vender essa quantidade!";
+				}
+				
 			}
 		}
-		return null;
+		return "Produto indisponivel!";
+	}
+	@RequestMapping(value = "produto/obterProdutos", method = RequestMethod.GET)
+	private ArrayList<Produto> mostrarTodosProdutos(){
+		return this.listaProdutos;
 	}
 }
